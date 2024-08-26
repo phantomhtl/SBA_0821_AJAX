@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Artworks Gallery</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Add Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Artworks Gallery</h1>
+      <input type="text" id="searchQuery" placeholder="Search artworks..." />
+      <button id="searchArtwork">SEARCH</button>
+      <button id="loadArtwork">LOAD RANDOM ARTWORK</button>
+      <div id="artwork">
+        <h2 id="artworkTitle">Title</h2>
+        <p id="artworkArtist">Artist: Unknown</p>
+        <p id="artworkDate">Date: Unknown</p>
+        <img id="artworkImage" src="" alt="Artwork Image" />
+        <p id="artworkAltText">Alt Text:</p>
+      </div>
+      <div id="artworksContainer">
+        <!-- This is where the artwork items will be appended dynamically -->
+      </div>
+    </div>
+    <script type="module">
+      import { fetchRandomArtwork, searchArtworks } from "./api.mjs";
+      import { updateArtworkUI, displayMultipleArtworks, clearArtworksContainer } from "./ui.mjs";
+
+      document
+        .getElementById("loadArtwork")
+        .addEventListener("click", async () => {
+          try {
+            clearArtworksContainer();
+            const randomArtwork = await fetchRandomArtwork();
+            updateArtworkUI(randomArtwork);
+          } catch (error) {
+            console.error("Failed to load artwork:", error);
+          }
+        });
+      document
+        .getElementById("searchArtwork")
+        .addEventListener("click", async () => {
+          const query = document.getElementById("searchQuery").value.trim();
+          if (!query) {
+            alert("Please enter a search term");
+            return;
+          }
+          try {
+            clearArtworksContainer();
+            const searchResults = await searchArtworks(query);
+            if (searchResults.length > 0) {
+              displayMultipleArtworks(searchResults);
+              // updateArtworkUI(searchResults[0]);
+            } else {
+              alert("No artworks found for your search.");
+            }
+          } catch (error) {
+            console.error("Failed to search artworks:", error);
+            alert("An error occurred while searching for artworks.");
+          }
+        });
+    </script>
+  </body>
+</html>
